@@ -8,7 +8,7 @@ from typing import Dict, Any
 class GeneratedDescription(Base):
     __tablename__ = "generated_descriptions"
     
-    id: Mapped[int] = mapped_column(primary_key=True, index=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
     category: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
     product_data: Mapped[Dict[str, Any]] = mapped_column(JSON, nullable=False)
     generated_text: Mapped[str] = mapped_column(Text, nullable=False)

@@ -19,11 +19,14 @@ class ProductGenerateRequest(BaseModel):
     """
     category: str = Field(
         ...,
+        min_length=2,
+        max_length=50,
         description="Категория товара (например: smartphone)",
         examples = ["smartphones", "sneakers", "coffee_machines"]                  
     )
     attributes: Dict[str, Any] = Field(
         ...,
+        min_length=1,
         description="Характеристика товара в формате ключ-значение",
         examples = [
             {"brand": "Apple", "model": "iPhone 15", "memory": "128 ГБ"},
@@ -36,9 +39,9 @@ class GenerateResponse(BaseModel):
     """
     Ответ после успешной генерации описания.
     """
-    id: int = Field(..., description="Унвикальный ID записи в базе")
+    id: int = Field(..., description="Уникальный ID записи в базе")
     category: str = Field(..., description="Категория товара")
-    generated_text: str = Field(..., description="Сгенерированной текстовое описание")
+    generated_text: str = Field(..., description="Сгенерированное текстовое описание")
     status: str = Field(default="success", description="Статус операции")
     #как пример для Swagger UI
     model_config = ConfigDict(
@@ -92,7 +95,7 @@ class CategoriesResponse(BaseModel):
 
 class HistoryItem(BaseModel):
     """
-    Элемент историт сгенерированных описаний
+    Элемент истории сгенерированных описаний
     """
     id: int
     category: str
@@ -110,6 +113,28 @@ class HistoryResponse(BaseModel):
     """
     count: int = Field(..., description="Количество записей в ответе")
     items: list[HistoryItem] = Field(..., description="Список записей в истории")
+    
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "count": 2,
+                "items": [
+                    {
+                        "id": 1,
+                        "category": "smartphones",
+                        "generated_text": "Мощный смартфон...",
+                        "created_at": "2025-01-15T10:30:00"
+                    },
+                    {
+                        "id": 2,
+                        "category": "sneakers",
+                        "generated_text": "Стильные кроссовки...",
+                        "created_at": "2025-01-15T11:00:00"
+                    }
+                ]
+            }
+        }
+    )
     
 
 class ErrorResponse(BaseModel):
