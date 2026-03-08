@@ -26,6 +26,7 @@ class ProductGenerateRequest(BaseModel):
     )
     attributes: Dict[str, Any] = Field(
         ...,
+        min_length=1,
         description="Характеристика товара в формате ключ-значение"
     )
     
