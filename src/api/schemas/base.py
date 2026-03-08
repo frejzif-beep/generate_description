@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, ConfigDict
-from typing import Dict, Any
+from typing import Dict, Any, Optional, List
 from datetime import datetime
 
 
@@ -26,12 +26,7 @@ class ProductGenerateRequest(BaseModel):
     )
     attributes: Dict[str, Any] = Field(
         ...,
-        min_length=1,
-        description="Характеристика товара в формате ключ-значение",
-        examples = [
-            {"brand": "Apple", "model": "iPhone 15", "memory": "128 ГБ"},
-            {"brand": "Nike", "model": "Air Force 1", "size": "42"}
-        ]
+        description="Характеристика товара в формате ключ-значение"
     )
     
     
@@ -51,6 +46,21 @@ class GenerateResponse(BaseModel):
                 "category": "smartphones",
                 "generated_text": "Мощный Apple iPhone 15 с памятью 128 ГБ...",
                 "status": "success"
+            }
+        }
+    )
+
+
+class UpdateTextRequest(BaseModel):
+    """
+    Запрос на редактирование сгенерированного текста
+    """
+    edited_text: str = Field(..., min_length=1, max_length=10000, description="Отредактированный пользователем текст описания")
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "edited_text": "Этот мощный Apple iPhone 15 с памятью 128 ГБ - лучший выбор для профессионалов!"
             }
         }
     )
@@ -103,7 +113,15 @@ class HistoryItem(BaseModel):
     created_at: datetime
     
     model_config = ConfigDict(
-        from_attributes=True
+        from_attributes=True,
+        json_schema_extra={
+            "example": {
+                "id": 1,
+                "category": "smartphones",
+                "generated_text": "Мощный смартфон...",
+                "created_at": "2025-01-15T10:30:00"
+            }
+        }
     )
     
 
@@ -111,25 +129,29 @@ class HistoryResponse(BaseModel):
     """
     Ответ с историей генераций
     """
-    count: int = Field(..., description="Количество записей в ответе")
-    items: list[HistoryItem] = Field(..., description="Список записей в истории")
+    total: int = Field(..., description="Количество записей в ответе")
+    page: int = Field(..., description="Текущая страница.")
+    size: int = Field(..., description="Размер страницы.")
+    pages: int = Field(..., description="Всего страниц.")
+    has_next: bool = Field(..., description="Есть ли следующая страница")
+    has_prev: bool = Field(..., description="Есть ли предыдущая страница")
+    items: list[HistoryItem] = Field(..., description="Записи на текущей странице")
     
     model_config = ConfigDict(
         json_schema_extra={
             "example": {
-                "count": 2,
+                "total": 100,
+                "page": 0,
+                "size": 10,
+                "pages": 10,
+                "has_next": True,
+                "has_prev": False,
                 "items": [
                     {
                         "id": 1,
                         "category": "smartphones",
                         "generated_text": "Мощный смартфон...",
                         "created_at": "2025-01-15T10:30:00"
-                    },
-                    {
-                        "id": 2,
-                        "category": "sneakers",
-                        "generated_text": "Стильные кроссовки...",
-                        "created_at": "2025-01-15T11:00:00"
                     }
                 ]
             }
@@ -146,5 +168,28 @@ class ErrorResponse(BaseModel):
     model_config = ConfigDict(
         json_schema_extra={
             "example": {"detail": "Нужно указать category и attributes"}
+        }
+    )
+    
+class AttributeSchemaResponse(BaseModel):
+    """Ответ с JSON-схемой атрибутов для категории"""
+    category: str = Field(..., description="Категория товара")
+    schema: Optional[Dict[str, Any]] = Field(None, description="JSON-схема атрибутов.")
+    fields: List[str] = Field(..., description="Список доступных полей")
+    required: List[str] = Field(..., description="Список обязательных полей")
+    
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "category": "smartphones",
+                "schema": {
+                    "properties": {
+                        "brand": {"type": "string", "description": "Бренд"},
+                        "model": {"type": "string", "description": "Модель"}
+                    }
+                },
+                "fields": ["brand", "model", "memory"],
+                "required": ["brand", "model"]
+            }
         }
     )

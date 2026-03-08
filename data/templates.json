@@ -1,14 +1,45 @@
 {
   "smartphones": [
-    "Познакомьтесь с {model} от {brand}. Это мощный смартфон с памятью {memory} и камерой {camera}. Цвет: {color}.",
-    "Ищете надежность? {brand} {model} — ваш выбор. Объем памяти {memory}, отличная камера {camera}. Доступен в цвете {color}."
+    "Познакомьтесь с {{ model }} от {{ brand }}. Это мощный смартфон с {{ memory_text }} памяти{% if camera %} и камерой {{ camera }}{% endif %}.{% if color %} Доступен в цвете {{ color|lower }}.{% endif %} {% if attrs_count %}Всего характеристик: {{ attrs_count }} {{ attrs_count | plural(['штука', 'штуки', 'штук']) }}.{% endif %}",
+    
+    "{{ brand }} {{ model }} — {% if memory_value > 256 %}топовая производительность{% elif memory_value > 128 %}отличный баланс{% else %}надёжная база{% endif %}. Память: {{ memory_text }}. {% if camera %}Камера {{ camera }} для ярких снимков. {% endif %}{% if attrs_count %} Всего характеристик: {{ attrs_count }} {{ attrs_count | plural(['штука', 'штуки', 'штук']) }}.{% endif %}",
+    
+    "Новинка: {{ brand|upper }} {{ model }}! {% if memory_value > 512 %}Максимальный объём{% elif memory_value > 256 %}Много памяти{% else %}Оптимально{% endif %}: {{ memory_text }}. {% if camera %}Фотографируйте с камерой {{ camera }}. {% endif %}{% if attrs_count %} Всего характеристик: {{ attrs_count }} {{ attrs_count | plural(['штука', 'штуки', 'штук']) }}.{% endif %}",
+    
+    "{% if brand == 'Apple' %}Премиальный {{ brand }} {{ model }}{% else %}{{ brand }} {{ model }}{% endif %} — выбор тех, кто ценит качество. {{ memory_text }} для ваших задач.{% if camera %} Камера {{ camera }}. {% endif %}{% if attrs_count %} Всего характеристик: {{ attrs_count }} {{ attrs_count | plural(['штука', 'штуки', 'штук']) }}.{% endif %}"
   ],
+
   "sneakers": [
-    "Стильные кроссовки {model} от {brand}. Материал: {material}, цвет: {color}. Размер {size} обеспечит комфорт.",
-    "Новое поступление: {brand} {model}. Идеальны для города. Материал {material}, размер {size}. Цвет: {color}."
+    "Кроссовки {{ brand }} {{ model }} — {% if material %}из {{ material|lower }}, {% endif %}стиль и комфорт в каждом шаге. Размер: {{ size }}. {% if attrs_count %}Характеристик: {{ attrs_count }} {{ attrs_count | plural(['одна', 'две', 'три']) }}.{% endif %}",
+    
+    "{% if color %}{{ color|title }} {% endif %}{{ brand }} {{ model }}: идеальны для активного образа жизни. {% if attrs_count %}Всего полей: {{ attrs_count }} {{ attrs_count | plural(['одно', 'два', 'три']) }}.{% endif %}",
+    
+    "{{ brand }} {{ model }} — {% if material %}материал: {{ material }}. {% endif %}{% if attrs_count %}Характеристик: {{ attrs_count }} {{ attrs_count | plural(['одна', 'две', 'три']) }}.{% endif %}"
   ],
+
   "coffee_machines": [
-    "Кофемашина {brand} {model} сварит лучший кофе. Мощность {power}, давление {pressure}. Тип: {type}.",
-    "Ваша идеальная кухня с {brand} {model}. Мощность {power}, давление {pressure}. Полностью {type}."
+    "Кофемашина {{ brand }} {{ model }} сварит идеальный кофе.{% if power %} Мощность {{ power }}.{% endif %}{% if pressure %} Давление {{ pressure }} бар.{% endif %} {% if attrs_count %}Параметров: {{ attrs_count }} {{ attrs_count | plural(['один', 'два', 'три']) }}.{% endif %}",
+    
+    "{% if type == 'автоматическая' %}Полностью автоматическая {% elif type == 'капсульная' %}Удобная капсульная {% else %}{{ type|title }} {% endif %}кофемашина {{ brand }} {{ model }} — наслаждайтесь вкусом. {% if attrs_count %}Всего: {{ attrs_count }} {{ attrs_count | plural(['одна', 'две', 'три']) }}.{% endif %}",
+    
+    "{{ brand }} {{ model }} — {% if attributes.get('milk_frother') %}с капучинатором, {% endif %}идеальный выбор для кофемана. {% if attrs_count %}Характеристик: {{ attrs_count }} {{ attrs_count | plural(['одна', 'две', 'три']) }}.{% endif %}"
+  ],
+
+  "laptops": [
+    "Ноутбук {{ brand }} {{ model }} с {{ memory_text }} — {% if screen %}экран {{ screen }}, {% endif %}мощь для работы и игр.{% if processor %} Процессор: {{ processor }}.{% endif %} {% if attrs_count %}Всего характеристик: {{ attrs_count }} {{ attrs_count | plural(['одна', 'две', 'три']) }}.{% endif %}",
+    
+    "{{ brand }} {{ model }} — {% if memory_value > 16 %}оптимальный выбор{% else %}базовая конфигурация{% endif %}. {% if weight %}Вес всего {{ weight }}, удобно носить с собой. {% endif %}{% if attrs_count %} Полей: {{ attrs_count }} {{ attrs_count | plural(['одно', 'два', 'три']) }}.{% endif %}",
+    
+    "Новый {{ brand }} {{ model }}: быстрый, надёжный, стильный. {% if attrs_count %}Характеристик: {{ attrs_count }} {{ attrs_count | plural(['одна', 'две', 'три']) }}.{% endif %}",
+    
+    "{% if brand == 'Apple' %}MacBook {{ model }} — эталон качества{% else %}{{ brand }} {{ model }} — отличное соотношение цены и качества{% endif %}. {{ memory_text }} для всех ваших задач. {% if attrs_count %}Всего: {{ attrs_count }} {{ attrs_count | plural(['одна', 'две', 'три']) }}.{% endif %}"
+  ],
+
+  "headphones": [
+    "Наушники {{ brand }} {{ model }} — {% if type %}{{ type|lower }}, {% endif %}погрузитесь в мир чистого звука.{% if battery %} До {{ battery }} работы без подзарядки.{% endif %} {% if attrs_count %}Характеристик: {{ attrs_count }} {{ attrs_count | plural(['одна', 'две', 'три']) }}.{% endif %}",
+    
+    "{% if noise_cancelling %}Активное шумоподавление, {% endif %}{{ brand }} {{ model }} — комфорт на весь день.{% if connectivity %} Подключение: {{ connectivity }}. {% endif %}{% if attrs_count %} Всего: {{ attrs_count }} {{ attrs_count | plural(['одно', 'два', 'три']) }}.{% endif %}",
+    
+    "{{ brand }} {{ model }} — {% if driver_size %}драйверы {{ driver_size }}, {% endif %}глубокий бас и чистые высокие частоты.{% if attrs_count %}Характеристик: {{ attrs_count }} {{ attrs_count | plural(['одна', 'две', 'три']) }}.{% endif %}"
   ]
 }
