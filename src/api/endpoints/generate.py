@@ -1,12 +1,11 @@
 import logging
-from fastapi import APIRouter, Depends, HTTPException, status, Query
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, HTTPException, status, Query
 from sqlalchemy import select, delete, func
 from sqlalchemy.exc import SQLAlchemyError
-from src.api.dependencies import get_async_session
 from src.db.models import GeneratedDescription
 from src.services.generator import global_generator_service
 from pydantic import ValidationError
+from src.api.dependencies import SessionDep
 from src.services.exceptions import (
     GeneratorError,
     TemplateNotFoundError,
@@ -34,7 +33,7 @@ router = APIRouter(prefix="/api", tags=["Generation"])
 @router.post("/generate", response_model=GenerateResponse)
 async def generate_description(
     request: ProductGenerateRequest,
-    db: AsyncSession = Depends(get_async_session)
+    db: SessionDep
 ):
     """
     Генерируем описание товаров на основе характеристик
@@ -126,7 +125,7 @@ async def generate_description(
 @router.get("/generate/{description_id}", response_model=GenerateResponse)
 async def get_description_byId(
     description_id: int,
-    db: AsyncSession = Depends(get_async_session)
+    db: SessionDep
 ):
     """
     Получаем сгенерированное описание по ID
@@ -163,7 +162,7 @@ async def get_description_byId(
 async def update_description_by_Id(
     description_id: int,
     request: UpdateTextRequest,
-    db: AsyncSession = Depends(get_async_session)
+    db: SessionDep
 ):
     logger.info(f"Запрос на редактирование описания: id={description_id}")
     logger.debug(f"Новый текст (первые 100 символов): {request.edited_text[:100]}...")
@@ -212,7 +211,7 @@ async def update_description_by_Id(
 @router.delete("/generate/{description_id}", response_model=DeleteResponse)
 async def delete_description_byId(
     description_id: int,
-    db: AsyncSession = Depends(get_async_session)
+    db: SessionDep
 ):
     logger.info(f"Запрос на удаление: id={description_id}")
     
@@ -252,9 +251,9 @@ async def delete_description_byId(
     response_model=HistoryResponse
 )
 async def get_history(
+    db: SessionDep,
     page: int = Query(0, ge=0, description="Номер страницы"),
     size: int = Query(10, ge=1, le=100, description="Размер страницы."),
-    db: AsyncSession = Depends(get_async_session)
 ):
     logger.debug(f"Запрос истории: page={page}, size={size}")
     
@@ -291,10 +290,10 @@ async def get_history(
     
 @router.get("/history/{category}", response_model=HistoryResponse)
 async def get_history_by_category(
-    category: str, 
+    category: str,
+    db: SessionDep, 
     page: int = Query(0, ge=0, description="Номер страницы"),
     size: int = Query(10, ge=1, le=100, description="Размер страницы"),
-    db: AsyncSession = Depends(get_async_session)    
 ):
     """Возвращает историю генераций для конкретной категории"""
     logger.debug(f"Запрос истории для категории {category}: page = {page}, size = {size}")
@@ -365,7 +364,7 @@ async def get_category_attributes(category: str):
         model_class = CATEGORY_SCHEMAS[category]
         schema = model_class.model_json_schema()
         
-        # Получаем список вех полей
+        # Получаем список всех полей
         properties = schema.get("properties", {})
         fields = list(properties.keys())
         
@@ -378,6 +377,7 @@ async def get_category_attributes(category: str):
             fields=fields,
             required=required
         )
+        
     elif category in global_generator_service.templates:
         return AttributeSchemaResponse(
             category=category,

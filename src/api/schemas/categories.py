@@ -3,6 +3,7 @@ from typing import Optional, Union, Literal
 from datetime import date
 
 
+
 class BaseAttributes(BaseModel):
     """Общие атрибуты для всех товаров"""
     brand: str = Field(..., min_length=1, max_length=100, description="Бренд")
