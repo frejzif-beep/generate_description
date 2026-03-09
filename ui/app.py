@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+import os
 from datetime import datetime
 
 
@@ -14,7 +15,7 @@ st.set_page_config(
 
 # КОНФИГУРАЦИЯ API
 
-API_URL = "http://localhost:8000/api"
+API_URL = os.getenv("API_URL", "http://localhost:8000/api")
 
 # CSS СТИЛИ
 

@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  # 🐘 База данных (PostgreSQL)
+  db:
+    image: postgres:15-alpine
+    container_name: ecommerce_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ecommerce_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 🚀 Backend (FastAPI)
+  api:
+    build: .
+    container_name: ecommerce_api
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASS=postgres
+      - DB_NAME=ecommerce_db
+      - PROJECT_NAME=E-commerce Generator
+      - DEBUG=True
+      - LOG_LEVEL=INFO
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # 🎨 Frontend (Streamlit UI)
+  ui:
+    build:
+      context: .
+      dockerfile: Dockerfile.ui
+    container_name: ecommerce_ui
+    ports:
+      - "8501:8501"
+    environment:
+      - API_URL=http://api:8000/api
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
