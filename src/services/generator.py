@@ -87,13 +87,15 @@ class TextGenerator:
         try:
             template = self.jinja2_env.get_template(template_key)
             logger.debug(f"Выбран шаблон: {template_key}")
-            
+            memory = attributes.get("memory")
             #Рендерим с атрибутами
             context = {
                 **attributes,
                 'attributes': attributes,
                 "attrs_count": len(attributes),
-                "category": category
+                "category": category,
+                "memory_value": memory if isinstance(memory, (int, float)) else 0,
+                "memory_text": f"{memory} ГБ" if memory else "",
             }
             description = template.render(**context)
             logger.info(f"Генерация прошла успешно: {len(description)} символов")
