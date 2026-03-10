@@ -344,13 +344,9 @@ async def get_history_by_category(
     
 @router.get("/categories", response_model=CategoriesResponse)
 async def get_categories():
-    
     logger.debug("Запрос списка категорий")
-    
     categories = list(global_generator_service.templates.keys())
-    
     logger.info(f"Возвращено {len(categories)} категорий: {categories}")
-    
     return CategoriesResponse(
         count=len(categories),
         categories=categories
